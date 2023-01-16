@@ -21,6 +21,9 @@ Optionally, you can manually strip the library to decrease binary size:
   (x'cafe').
 - `chia_amount_int(blob) -> integer`: Parse a Chia amount blob into an integer
   (representing mojos).
+- `chia_fullblock_json(blob) -> text`: Parse a blob holding a Chia-serialized
+  block into JSON. The returned text is valid JSON and can be further processed
+  using SQLite's JSON functions.
 
 ## Dependencies & References
 

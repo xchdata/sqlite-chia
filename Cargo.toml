@@ -16,6 +16,9 @@ name = "chia"
 [dependencies]
 anyhow = "1.0.54"
 bech32 = "0.8.1"
+# Needed until std::error (PR#123) and serde (PR#) PRs are merged.
+chia-protocol = { git = "https://github.com/xchdata/chia_rs", branch = "main", features = ["serde"] }
+serde_json = "1.0.91"
 
 [dependencies.rusqlite]
 package = "rusqlite-le"

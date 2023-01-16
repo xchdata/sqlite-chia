@@ -34,6 +34,10 @@ fn create_functions(db: &rusqlite::Connection) -> anyhow::Result<()> {
                                 1,
                                 flags,
                                 |ctx| chia_amount_int(ctx).map_err(ah))?;
+    db.create_scalar_function("chia_fullblock_json",
+                                1,
+                                flags,
+                                |ctx| chia_fullblock_json(ctx).map_err(ah))?;
     Ok(())
 }
 
@@ -67,6 +71,14 @@ fn chia_amount_int<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
     let bytes: [u8; 8] = blob.try_into().unwrap();
     let mojos = i64::from_be_bytes(bytes);  // @@ i64 != u64
     Ok(ToSqlOutput::Owned(Value::Integer(mojos)))
+}
+
+fn chia_fullblock_json<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
+    use chia_protocol::Streamable;
+    let blob = ctx.get::<Vec<u8>>(0)?;
+    let block = chia_protocol::FullBlock::parse(&mut Cursor::new(&blob))?;
+    let json: String = serde_json::to_string(&block)?;
+    Ok(ToSqlOutput::Owned(Value::Text(json)))
 }
 
 #[cfg(test)]
