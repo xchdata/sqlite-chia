@@ -38,6 +38,10 @@ fn create_functions(db: &rusqlite::Connection) -> anyhow::Result<()> {
                                 1,
                                 flags,
                                 |ctx| chia_fullblock_json(ctx).map_err(ah))?;
+    db.create_scalar_function("zstd_decompress_blob",
+                                1,
+                                flags,
+                                |ctx| zstd_decompress_blob(ctx).map_err(ah))?;
     Ok(())
 }
 
@@ -79,6 +83,12 @@ fn chia_fullblock_json<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
     let block = chia_protocol::FullBlock::parse(&mut Cursor::new(&blob))?;
     let json: String = serde_json::to_string(&block)?;
     Ok(ToSqlOutput::Owned(Value::Text(json)))
+}
+
+fn zstd_decompress_blob<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
+    let blob = ctx.get::<Vec<u8>>(0)?;
+    let out = zstd::stream::decode_all(blob.as_slice())?;
+    Ok(ToSqlOutput::Owned(Value::Blob(out)))
 }
 
 #[cfg(test)]
@@ -154,6 +164,16 @@ pub mod tests {
                    db.query_row("select chia_amount_int(x'00000502D3B618FD')",
                                 [],
                                 |r| r.get::<usize, u64>(0))?);
+        Ok(())
+    }
+
+    #[test]
+    fn zstd_decompress_blob_works() -> anyhow::Result<()> {
+        let db = open_db()?;
+        assert_eq!("CAFE".to_string(),
+                   db.query_row("select hex(zstd_decompress_blob(x'28b52ffd0458110000cafe23ae5cb0'));",
+                                [],
+                                |r| r.get::<usize, String>(0))?);
         Ok(())
     }
 }
