@@ -38,6 +38,10 @@ fn create_functions(db: &rusqlite::Connection) -> anyhow::Result<()> {
                                 1,
                                 flags,
                                 |ctx| chia_fullblock_json(ctx).map_err(ah))?;
+    db.create_scalar_function("sha256sum",
+                                1,
+                                flags,
+                                |ctx| sha256sum(ctx).map_err(ah))?;
     db.create_scalar_function("zstd_decompress_blob",
                                 1,
                                 flags,
@@ -83,6 +87,14 @@ fn chia_fullblock_json<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
     let block = chia_protocol::FullBlock::parse(&mut Cursor::new(&blob))?;
     let json: String = serde_json::to_string(&block)?;
     Ok(ToSqlOutput::Owned(Value::Text(json)))
+}
+
+fn sha256sum<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
+    use sha2::Digest;
+    let blob = ctx.get::<Vec<u8>>(0)?;
+    let data = blob.as_slice();
+    let digest = sha2::Sha256::digest(data);
+    Ok(ToSqlOutput::Owned(Value::Blob(digest.to_vec())))
 }
 
 fn zstd_decompress_blob<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
@@ -164,6 +176,16 @@ pub mod tests {
                    db.query_row("select chia_amount_int(x'00000502D3B618FD')",
                                 [],
                                 |r| r.get::<usize, u64>(0))?);
+        Ok(())
+    }
+
+    #[test]
+    fn sha256sum_works() -> anyhow::Result<()> {
+        let db = open_db()?;
+        assert_eq!("03346F0E7990DE2423A3BCA5335BF92CDC0BD14BEF2206B87C63F18A1E996C52".to_string(),
+                   db.query_row("select hex(sha256sum(x'cafe'))",
+                                [],
+                                |r| r.get::<usize, String>(0))?);
         Ok(())
     }
 

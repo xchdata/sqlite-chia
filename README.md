@@ -24,6 +24,7 @@ Optionally, you can manually strip the library to decrease binary size:
 - `chia_fullblock_json(blob) -> text`: Parse a blob holding a Chia-serialized
   block into JSON. The returned text is valid JSON and can be further processed
   using SQLite's JSON functions.
+- `sha256sum(blob) -> blob`: Computes a SHA256 digest.
 - `zstd_decompress_blob(blob) -> blob`: Decompress a Zstandard-compressed blob.
 
 ## Dependencies & References

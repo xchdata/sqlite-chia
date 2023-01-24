@@ -20,6 +20,7 @@ bech32 = "0.8.1"
 chia-protocol = { git = "https://github.com/xchdata/chia_rs", branch = "main", features = ["serde"] }
 serde_json = "1.0.91"
 zstd = "0.12.2"
+sha2 = "0.10.2"
 
 [dependencies.rusqlite]
 package = "rusqlite-le"
