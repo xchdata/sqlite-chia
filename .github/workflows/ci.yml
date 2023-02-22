@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: cargo test --verbose
+
+      - name: Build library
+        run: cargo build --verbose --release --features build_extension
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: libchia.so
+          path: target/release/libchia.so

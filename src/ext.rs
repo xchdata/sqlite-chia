@@ -4,7 +4,7 @@
 use rusqlite::ffi;
 
 #[no_mangle]
-pub extern "C" fn sqlite3_extension_init(
+pub extern "C" fn sqlite3_chia_init(
     db_handle: *mut ffi::sqlite3,
     _pz_err_msg: &mut &mut std::os::raw::c_char,
     p_api: *mut ffi::sqlite3_api_routines,
