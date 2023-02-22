@@ -10,7 +10,7 @@ default = []
 build_extension = ["rusqlite/loadable_extension"]
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "staticlib"]
 name = "chia"
 
 [dependencies]
