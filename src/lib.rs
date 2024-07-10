@@ -75,9 +75,9 @@ fn chia_amount_int<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
 }
 
 fn chia_fullblock_json<'a>(ctx: &Context) -> anyhow::Result<ToSqlOutput<'a>> {
-    use chia_protocol::Streamable;
+    use chia_traits::streamable::Streamable;
     let blob = ctx.get::<Vec<u8>>(0)?;
-    let block = chia_protocol::FullBlock::parse(&mut Cursor::new(&blob))?;
+    let block = chia_protocol::FullBlock::parse::<true>(&mut Cursor::new(&blob))?;
     let json: String = serde_json::to_string(&block)?;
     Ok(ToSqlOutput::Owned(Value::Text(json)))
 }

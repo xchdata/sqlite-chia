@@ -16,8 +16,9 @@ name = "chia"
 [dependencies]
 anyhow = "1.0.54"
 bech32 = "0.8.1"
-# Needed until std::error (PR#123) and serde (PR#) PRs are merged.
-chia-protocol = { git = "https://github.com/xchdata/chia_rs", branch = "main", features = ["serde"] }
+# Needed until serde (PR127#) is merged.
+chia-protocol = { git = "https://github.com/xchdata/chia_rs", branch = "serde", features = ["serde"] }
+chia-traits = { git = "https://github.com/xchdata/chia_rs", branch = "serde" }
 serde_json = "1.0.91"
 zstd = "0.12.2"
 sha2 = "0.10.2"
